@@ -18,6 +18,5 @@ namespace PetService.Models
         public string ownerPrimaryPhone;
         public string imageURL;
         
-
     }
 }
