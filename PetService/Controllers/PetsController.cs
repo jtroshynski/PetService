@@ -9,7 +9,7 @@ using PetService.Models;
 
 namespace PetService.Controllers
 {
-    public class PetController : ApiController
+    public class PetsController : ApiController
     {
         Pet[] pets = new Pet[]
         {
