@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LiteDB;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -7,8 +8,11 @@ namespace PetService.Models
 {
     public class Pet
     {
+        public Pet() { }
         //species of pet, it’s name, age, sex, description, pet owner’s contact info, and an image URL
-        public int id;
+        [BsonId]
+        public int Id;
+
         public string name;
         public string species;
         public int age;

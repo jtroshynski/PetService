@@ -13,9 +13,9 @@ namespace PetService.Controllers
     {
         Pet[] pets = new Pet[]
         {
-            new Pet { id = 1, name = "Baba", species = "Rabbit", age = 1, sex = "M"},
-            new Pet { id = 2, name = "Petunia", species = "Cat", age = 1, sex = "F" },
-            new Pet { id = 3, name = "Mongo", species = "Dog", age = 1, sex = "M" }
+            new Pet {name = "Baba", species = "Rabbit", age = 1, sex = "M"},
+            new Pet {name = "Petunia", species = "Cat", age = 1, sex = "F" },
+            new Pet {name = "Mongo", species = "Dog", age = 1, sex = "M" }
         };
 
         //public IEnumerable<Pet> GetAllPets()
@@ -25,11 +25,14 @@ namespace PetService.Controllers
 
         public IHttpActionResult GetAllPets()
         {
+            var mapper = new BsonMapper();
+            mapper.IncludeFields = true;
             // Open database (or create if not exits)
-            using (var db = new LiteDatabase(@"D:\development\workspace\PetService\Pets.db"))
+            using (var db = new LiteDatabase(@"D:\development\workspace\PetService\Pets.db", mapper))
             {
                 // Get customer collection
                 var pets = db.GetCollection<Pet>("pets");
+                BsonMapper.Global.IncludeFields = true;
 
                 // Create your new customer instance
                 Pet pet = new Pet(){ name = "Baba", species = "Rabbit", age = 1, sex = "M" };
@@ -47,7 +50,7 @@ namespace PetService.Controllers
                 // Use Linq to query documents
                 var results = pets.Find(x => x.name.StartsWith("P"));
 
-                return Ok(results);
+                return Ok(results.FirstOrDefault());
             }
             //var pet = pets.FirstOrDefault((p) => p.id == id);
             //if (pet == null)
@@ -57,14 +60,14 @@ namespace PetService.Controllers
             
         }
 
-        public IHttpActionResult GetPet(int id)
-        {
-            var pet = pets.FirstOrDefault((p) => p.id == id);
-            if (pet == null)
-            {
-                return NotFound();
-            }
-            return Ok(pet);
-        }
+        //public IHttpActionResult GetPet(int id)
+        //{
+        //    var pet = pets.FirstOrDefault((p) => p.Id == id);
+        //    if (pet == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    return Ok(pet);
+        //}
     }
 }
