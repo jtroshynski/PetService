@@ -11,41 +11,84 @@ namespace PetService.Controllers
 {
     public class PetsController : ApiController
     {
-        Pet[] pets = new Pet[]
-        {
-            new Pet {name = "Baba", species = "Rabbit", age = 1, sex = "M"},
-            new Pet {name = "Petunia", species = "Cat", age = 1, sex = "F" },
-            new Pet {name = "Mongo", species = "Dog", age = 1, sex = "M" }
-        };
-
-        //public IEnumerable<Pet> GetAllPets()
+        private string databasePath = @"D:\development\workspace\PetService\Pets.db";
+        //Pet[] pets = new Pet[]
         //{
-        //    return pets;
-        //}
+        //    new Pet {name = "Baba", species = "Rabbit", age = 1, sex = "M"},
+        //    new Pet {name = "Petunia", species = "Cat", age = 1, sex = "F" },
+        //    new Pet {name = "Mongo", species = "Dog", age = 1, sex = "M" }
+        //};
+
 
         public IHttpActionResult GetAllPets()
         {
             var mapper = new BsonMapper();
             mapper.IncludeFields = true;
-            // Open database (or create if not exits)
-            using (var db = new LiteDatabase(@"D:\development\workspace\PetService\Pets.db", mapper))
+            // Open database (or create if it doesn't exist)
+            using (var db = new LiteDatabase(databasePath, mapper))
             {
-                // Get customer collection
+                // Get pet collection
                 var pets = db.GetCollection<Pet>("pets");
                 BsonMapper.Global.IncludeFields = true;
 
-                // Create your new customer instance
-                Pet pet = new Pet(){ name = "Baba", species = "Rabbit", age = 1, sex = "M" };
+                Pet pet = new Pet(){ name = "Mongo", species = "Dog", age = 2, sex = "M" };
 
                 pets.Insert(pet);
 
-                // Update a document inside a collection
-                pet.name = "Petunia";
-                pet.species = "Cat";
+                pets.EnsureIndex(x => x.name);
 
-                pets.Update(pet);
+                // Use Linq to query documents
+                var results = pets.FindAll();
 
-                // Index document using a document property
+                if (results != null)
+                {
+                    return Ok(results.ToList());
+                }
+                else
+                {
+                    return NotFound();
+                }
+            }
+            
+        }
+
+        public IHttpActionResult Get(int id)
+        {
+            var mapper = new BsonMapper();
+            mapper.IncludeFields = true;
+            // Open database (or create if it doesn't exist)
+            using (var db = new LiteDatabase(databasePath, mapper))
+            {
+                // Get pet collection
+                var pets = db.GetCollection<Pet>("pets");
+                BsonMapper.Global.IncludeFields = true;
+
+                var results = pets.Find(x => x.name.StartsWith("D"));
+
+                if (results != null)
+                {
+                    return Ok(results.ToList());
+                }
+                else
+                {
+                    return NotFound();
+                }
+            }
+        }
+
+        // POST: api/student
+        public IHttpActionResult Post([FromBody]Pet pet)
+        {
+            var mapper = new BsonMapper();
+            mapper.IncludeFields = true;
+            // Open database (or create if it doesn't exist)
+            using (var db = new LiteDatabase(databasePath, mapper))
+            {
+                // Get pet collection
+                var pets = db.GetCollection<Pet>("pets");
+
+                pets.Insert(pet);
+
                 pets.EnsureIndex(x => x.name);
 
                 // Use Linq to query documents
@@ -57,25 +100,63 @@ namespace PetService.Controllers
                 }
                 else
                 {
-                    return Ok();
+                    return NotFound();
                 }
             }
-            //var pet = pets.FirstOrDefault((p) => p.id == id);
-            //if (pet == null)
-            //{
-            //    return NotFound();
-            //}
-            
         }
 
-        //public IHttpActionResult GetPet(int id)
-        //{
-        //    var pet = pets.FirstOrDefault((p) => p.Id == id);
-        //    if (pet == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    return Ok(pet);
-        //}
+        // PUT: api/student/5
+        public IHttpActionResult Put(int id, [FromBody]Pet pet)
+        {
+            var mapper = new BsonMapper();
+            mapper.IncludeFields = true;
+            // Open database (or create if it doesn't exist)
+            using (var db = new LiteDatabase(databasePath, mapper))
+            {
+                // Get pet collection
+                var pets = db.GetCollection<Pet>("pets");
+
+                pet.Id = id;
+
+                pets.Insert(pet);
+
+                return Ok();
+
+                //if (results != null)
+                //{
+                //    return Ok(results.ToList());
+                //}
+                //else
+                //{
+                //    return NotFound();
+                //}
+            }
+        }
+
+        // DELETE: api/student/5
+        public IHttpActionResult Delete(int id)
+        {
+            var mapper = new BsonMapper();
+            mapper.IncludeFields = true;
+            // Open database (or create if it doesn't exist)
+            using (var db = new LiteDatabase(databasePath, mapper))
+            {
+                // Get pet collection
+                var pets = db.GetCollection<Pet>("pets");
+
+                // Use Linq to query documents
+                var results = pets.Find(x => x.Id == id);
+
+                if (results != null)
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return NotFound();
+                    //System.Web.Http.Results.
+                }
+            }
+        }
     }
 }
