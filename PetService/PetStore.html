@@ -28,12 +28,15 @@
               $.each(data, function (index, value) {
                   console.log(value);
               // Add a list item for the product.
-              $('<li>', { text: formatItem(data) }).appendTo($('#pets'));
+                  $('<li>', { text: formatItem(value) }).appendTo($('#pets'));
             });
           });
     });
 
-    function formatItem(item) {
+        function formatItem(item) {
+        console.log("item: " + item)
+
+        console.log("item.name: " + item.name)
       return item.name + ' - ' + item.species;
     }
 

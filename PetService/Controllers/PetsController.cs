@@ -40,7 +40,8 @@ namespace PetService.Controllers
                 pets.Insert(pet);
 
                 // Update a document inside a collection
-                pet.name = "Petunia2";
+                pet.name = "Petunia";
+                pet.species = "Cat";
 
                 pets.Update(pet);
 
@@ -48,9 +49,16 @@ namespace PetService.Controllers
                 pets.EnsureIndex(x => x.name);
 
                 // Use Linq to query documents
-                var results = pets.Find(x => x.name.StartsWith("P"));
+                var results = pets.Find(x => x.name.StartsWith("D"));
 
-                return Ok(results.FirstOrDefault());
+                if (results != null)
+                {
+                    return Ok(results.ToList());
+                }
+                else
+                {
+                    return Ok();
+                }
             }
             //var pet = pets.FirstOrDefault((p) => p.id == id);
             //if (pet == null)
