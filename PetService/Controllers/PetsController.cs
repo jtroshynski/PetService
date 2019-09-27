@@ -11,21 +11,60 @@ namespace PetService.Controllers
 {
     public class PetsController : ApiController
     {
-        private string databasePath = @"C:\development\Solutions\Pets.db";
+        private string databasePath = @"D:\development\workspace\PetService\Pets.db";
 
         //api/pets
-        public IHttpActionResult GetAllPets()
+        public IHttpActionResult GetPets(string name = null, int? age = null, string sex = null, string description = null, string ownerEmail = null, string ownerPrimaryPhone = null, string imageURL = null)
         {
             var mapper = new BsonMapper();
             mapper.IncludeFields = true;
             // Open database (or create if it doesn't exist)
             using (var db = new LiteDatabase(databasePath, mapper))
             {
-                // Get pet collection
                 var pets = db.GetCollection<Pet>("pets");
                 BsonMapper.Global.IncludeFields = true;
 
-                var results = pets.FindAll();
+                Query filterQuery = null;
+
+                if (name != null)
+                {
+                    filterQuery = Query.EQ("name", name);
+                }
+                else if (age != null)
+                {
+                    filterQuery = Query.EQ("age", age);
+                }
+                else if (sex != null)
+                {
+                    filterQuery = Query.EQ("sex", sex);
+                }
+                else if (description != null)
+                {
+                    filterQuery = Query.EQ("description", description);
+                }
+                else if (ownerEmail != null)
+                {
+                    filterQuery = Query.EQ("ownerEmail", ownerEmail);
+                }
+                else if (ownerPrimaryPhone != null)
+                {
+                    filterQuery = Query.EQ("ownerPrimaryPhone", ownerPrimaryPhone);
+                }
+                else if (imageURL != null)
+                {
+                    filterQuery = Query.EQ("imageURL", imageURL);
+                }
+
+                IEnumerable<Pet> results;
+
+                if (filterQuery != null)
+                {
+                    results = pets.Find(filterQuery);
+                }
+                else
+                {
+                    results = pets.FindAll();
+                }
 
                 if (results != null)
                 {
@@ -46,7 +85,6 @@ namespace PetService.Controllers
             // Open database (or create if it doesn't exist)
             using (var db = new LiteDatabase(databasePath, mapper))
             {
-                // Get pet collection
                 var pets = db.GetCollection<Pet>("pets");
                 BsonMapper.Global.IncludeFields = true;
 
@@ -63,7 +101,12 @@ namespace PetService.Controllers
             }
         }
 
-        // POST: api/pets
+        /// <summary>
+        /// Inserts pets in the database with the next available id 
+        /// POST: api/pets
+        /// </summary>
+        /// <param name="pets"></param>
+        /// <returns></returns>
         public IHttpActionResult Post(List<Pet> pets)
         {
             var mapper = new BsonMapper();
@@ -71,45 +114,55 @@ namespace PetService.Controllers
             // Open database (or create if it doesn't exist)
             using (var db = new LiteDatabase(databasePath, mapper))
             {
-                // Get pet collection
                 var petsDb = db.GetCollection<Pet>("pets");
 
-                List<int> ids = new List<int>();
+                List<int?> ids = new List<int?>();
 
                 foreach (Pet pet in pets)
                 {
-                    ids.Add(petsDb.Insert(pet));
+                    pet.Id = null; //make sure id is removed, so we don't overwrite an existing pet
+                    ids.Add(petsDb.Insert(pet)); //add ids returned from insertion, to return updated pets
                 }
                 petsDb.EnsureIndex(x => x.name);
 
                 var results = pets.FindAll(x => ids.Contains(x.Id));
 
                 return Ok(results.ToList());
-                
             }
         }
 
-        // PUT: api/pets?id=1
-        public IHttpActionResult Put(int id, [FromBody]Pet pet)
+        /// <summary>
+        /// Inserts or updates pets with Ids
+        /// PUT: api/pets?id=1
+        /// </summary>
+        /// <param name="pets">List of pet objects, must have Ids.</param>
+        /// <returns></returns>
+        public IHttpActionResult Put(List<Pet> pets)
         {
             var mapper = new BsonMapper();
             mapper.IncludeFields = true;
             // Open database (or create if it doesn't exist)
             using (var db = new LiteDatabase(databasePath, mapper))
             {
-                // Get pet collection
-                var pets = db.GetCollection<Pet>("pets");
+                var petsDb = db.GetCollection<Pet>("pets");
 
-                if (pets.Exists(x => x.Id == id))
+                foreach (Pet pet in pets )
                 {
-                    return BadRequest("Item already exists at with the given id: " + id);
+                    if (pet.Id == null)
+                    {
+                        return BadRequest("All pets must have Ids. Some pets may have been updated.");
+                    }
+                    if (petsDb.Exists(x => x.Id == pet.Id))
+                    {
+                        petsDb.Update(pet);
+                    }
+                    else
+                    {
+                        petsDb.Insert(pet);
+                    }
                 }
 
-                pet.Id = id;
-                pets.Insert(pet);
-
                 return Ok("Successful Insertion");
-
             }
         }
 
@@ -121,14 +174,11 @@ namespace PetService.Controllers
             // Open database (or create if it doesn't exist)
             using (var db = new LiteDatabase(databasePath, mapper))
             {
-                // Get pet collection
                 var pets = db.GetCollection<Pet>("pets");
 
-                // Use Linq to query documents
-                var results = pets.Delete(id);
+                pets.Delete(id);
 
                 return Ok("Successful deletion");
-
             }
         }
     }
