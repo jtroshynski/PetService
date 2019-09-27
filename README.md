@@ -6,9 +6,12 @@ To test, please follow the following steps:
 1. Clone the repository using this url: https://github.com/jtroshynski/PetService.git
 
 2. Change the filepath of the database file using the following steps
--Open the file Controllers/PetController.cs
--Change the variable databaseFilePath to point to your local copy of the Pets.db file database, given as part of the project.
-Ex. databaseFilePath = @"D:/development/workspace/PetService/Pets.db"
+
+    -Open the file Controllers/PetController.cs
+
+    -Change the variable databaseFilePath to point to your local copy of the Pets.db file database, given as part of the project.
+    
+    Ex. databaseFilePath = @"D:/development/workspace/PetService/Pets.db"
 
 3. Run the "PetStore.html" file to start your local web service.
 
