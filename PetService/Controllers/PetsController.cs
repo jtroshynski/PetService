@@ -11,10 +11,23 @@ namespace PetService.Controllers
 {
     public class PetsController : ApiController
     {
+        //***NOTE: Change this file path to your local copy of the Pets.db file to make the program runs correctly.
         private string databasePath = @"D:\development\workspace\PetService\Pets.db";
 
-        //api/pets
-        public IHttpActionResult GetPets(string name = null, int? age = null, string sex = null, string description = null, string ownerEmail = null, string ownerPrimaryPhone = null, string imageURL = null)
+        /// <summary>
+        /// Gets all pets based on the given filter. Can only filter one parameter per call.
+        /// If no filter is given, will return all pets in the database.
+        /// http://localhost:59929/api/pets
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="age"></param>
+        /// <param name="sex"></param>
+        /// <param name="description"></param>
+        /// <param name="ownerEmail"></param>
+        /// <param name="ownerPrimaryPhone"></param>
+        /// <param name="imageURL"></param>
+        /// <returns></returns>
+        public IHttpActionResult GetPets(bool count = false, string name = null, int? age = null, string sex = null, string description = null, string ownerEmail = null, string ownerPrimaryPhone = null, string imageURL = null)
         {
             var mapper = new BsonMapper();
             mapper.IncludeFields = true;
@@ -24,6 +37,7 @@ namespace PetService.Controllers
                 var pets = db.GetCollection<Pet>("pets");
                 BsonMapper.Global.IncludeFields = true;
 
+                //Find the non-null filter item
                 Query filterQuery = null;
 
                 if (name != null)
@@ -55,29 +69,35 @@ namespace PetService.Controllers
                     filterQuery = Query.EQ("imageURL", imageURL);
                 }
 
-                IEnumerable<Pet> results;
-
+                //Get pets using filter query
                 if (filterQuery != null)
                 {
-                    results = pets.Find(filterQuery);
+                    if (count == true)
+                    {
+                        return Ok(pets.Count(filterQuery));
+                    }
+
+                    return Ok(pets.Find(filterQuery).ToList());
                 }
-                else
+                else //Get all pets, no filter query was given
                 {
-                    results = pets.FindAll();
+                    if (count == true)
+                    {
+                        return Ok(pets.Count());
+                    }
+
+                    return Ok(pets.FindAll());
                 }
 
-                if (results != null)
-                {
-                    return Ok(results.ToList());
-                }
-                else
-                {
-                    return NotFound();
-                }
             }
-
         }
-        //api/pets?id = 1
+
+        /// <summary>
+        /// Gets a single pet by id
+        /// http://localhost:59929/api/pets?id=1
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public IHttpActionResult Get(int id)
         {
             var mapper = new BsonMapper();
@@ -103,7 +123,7 @@ namespace PetService.Controllers
 
         /// <summary>
         /// Inserts pets in the database with the next available id 
-        /// POST: api/pets
+        /// POST: http://localhost:59929/api/pets
         /// </summary>
         /// <param name="pets"></param>
         /// <returns></returns>
@@ -133,7 +153,7 @@ namespace PetService.Controllers
 
         /// <summary>
         /// Inserts or updates pets with Ids
-        /// PUT: api/pets?id=1
+        /// PUT: http://localhost:59929/api/pets?id=1
         /// </summary>
         /// <param name="pets">List of pet objects, must have Ids.</param>
         /// <returns></returns>
@@ -166,7 +186,12 @@ namespace PetService.Controllers
             }
         }
 
-        // DELETE: api/pets?id=1
+        /// <summary>
+        /// Deletes the pet at a given index
+        /// http://localhost:59929/api/pets?id=1
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public IHttpActionResult Delete([FromBody]int id)
         {
             var mapper = new BsonMapper();
