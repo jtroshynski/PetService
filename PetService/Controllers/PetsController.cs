@@ -137,11 +137,10 @@ namespace PetService.Controllers
             {
                 var petsDb = db.GetCollection<Pet>("pets");
 
-                List<int?> ids = new List<int?>();
+                List<int> ids = new List<int>();
 
                 foreach (Pet pet in pets)
                 {
-                    pet.Id = null; //make sure id is removed, so we don't overwrite an existing pet
                     ids.Add(petsDb.Insert(pet)); //add ids returned from insertion, to return updated pets
                 }
                 petsDb.EnsureIndex(x => x.name);

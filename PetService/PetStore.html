@@ -3,53 +3,14 @@
 <head>
     <title>PetService</title>
 </head>
-<body>
+<body style="font-family:Calibri" >
 
     <div>
-        <h2>All Pets</h2>
-        <ul id="pets" />
-    </div>
-    <div>
-        <h2>Search by ID</h2>
-        <input type="text" id="petId" size="5" />
-        <input type="button" value="Search" onclick="find();" />
-        <p id="pet" />
+        <h2>Pet Service</h2>
+        <p>To run, use the postman script here: https://www.getpostman.com/collections/5cc07c6dbcf353534c3f </p>
+        <p>Make sure the postman urls are pointed at the same localhost as listed in your web browser</p>
+        <p>Make sure the databasePath variable is set to your local copy of the Pets.db</p>
     </div>
 
-    <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.0.3.min.js"></script>
-    <script>
-    var uri = 'api/pets';
-
-    $(document).ready(function () {
-      // Send an AJAX request
-      $.getJSON(uri)
-          .done(function (data) {
-            // On success, 'data' contains a list of products.
-              $.each(data, function (index, value) {
-                  console.log(value);
-              // Add a list item for the product.
-                  $('<li>', { text: formatItem(value) }).appendTo($('#pets'));
-            });
-          });
-    });
-
-        function formatItem(item) {
-        console.log("item: " + item)
-
-        console.log("item.name: " + item.name)
-      return item.name + ' - ' + item.species;
-    }
-
-    function find() {
-      var id = $('#petId').val();
-      $.getJSON(uri + '/' + id)
-          .done(function (data) {
-            $('#pet').text(formatItem(data));
-          })
-          .fail(function (jqXHR, textStatus, err) {
-            $('#pet').text('Error: ' + err);
-          });
-    }
-    </script>
 </body>
 </html>

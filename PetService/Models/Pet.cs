@@ -11,7 +11,7 @@ namespace PetService.Models
         public Pet() { }
         //species of pet, it’s name, age, sex, description, pet owner’s contact info, and an image URL
         [BsonId]
-        public int? Id;
+        public int Id;
 
         public string name;
         public string species;
