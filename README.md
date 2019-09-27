@@ -11,7 +11,7 @@ To test, please follow the following steps:
 
     -Change the variable databaseFilePath to point to your local copy of the Pets.db file database, given as part of the project.
     
-    Ex. databaseFilePath = @"D:/development/workspace/PetService/Pets.db"
+    Ex. databasePath = @"D:/development/workspace/PetService/Pets.db"
 
 3. Run the "PetStore.html" file to start your local web service.
 
