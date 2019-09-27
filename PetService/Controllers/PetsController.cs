@@ -19,6 +19,7 @@ namespace PetService.Controllers
         /// If no filter is given, will return all pets in the database.
         /// http://localhost:59929/api/pets
         /// </summary>
+        /// <param name="count">Boolean. If true, will return a count of the Pets in the db with the given filters. If false, will return a list of the Pet objects</param>
         /// <param name="name"></param>
         /// <param name="age"></param>
         /// <param name="sex"></param>
