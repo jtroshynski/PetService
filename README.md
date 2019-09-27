@@ -1,5 +1,5 @@
 # PetService
-An example API for a PetService built using ASP.NET and LiteDb.
+An example API for getting, updating, and deleting pets built using ASP.NET and LiteDb.
 
 To test, please follow the following steps:
 
